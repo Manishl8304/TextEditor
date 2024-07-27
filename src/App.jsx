@@ -15,13 +15,10 @@ export default function App() {
     const sortedNotes = notes.sort((a, b) => b.updatedAt - a.updatedAt)
     const currentNote = notes.find(note => note.id === currentNoteId) || notes[0]
 
-    console.log("Main Component called")
 
-    console.log(notes,currentNoteId,currentNote,sortedNotes)
     React.useEffect(() => {
 
         const unsubscribe = onSnapshot(notesCollection, (snapshot) => {
-            console.log("getting changes from firebase")
             const notesArr = snapshot.docs.map(doc => ({
                 ...doc.data(),
                 id:doc.id
@@ -33,25 +30,17 @@ export default function App() {
     
     React.useEffect(() => {
         if (!currentNoteId) {
-            console.log("setting current note id to notes0.id ")
             setCurrentNoteId(notes[0]?.id)
         }
     }, [notes])
 
     React.useEffect(() => {
         if (currentNote) {
-            console.log("setting tempNote text from current body")
             setTempNoteText(currentNote.body)
         }  
     }, [currentNote])
 
-    // React.useEffect(() => {
-    //     if (currentNote) {
-    //         console.log("setting tempNote text from current body")
-    //         setTempNoteText(currentNote?.body)
-    //     }  
-    // }, [])
-    
+
     React.useEffect(() => {
         const timeoutId = setTimeout(() => {
             if (currentNote && tempNoteText !== currentNote.body) {
@@ -62,7 +51,6 @@ export default function App() {
     }, [tempNoteText])
 
     async function createNewNote() {
-        console.log("creating a new note")
         const newNote = {
             body: "Untitled Note",
             createdAt: Date.now(),
@@ -73,28 +61,12 @@ export default function App() {
     }
     
     async function updateNote(text) {
-
-        // const temp = [...notes]
-        // const current = temp.find(tempnote => currentNoteId === tempnote.id)
-        // temp.splice(temp.indexOf(current),1)
-        // temp.unshift({
-        //     id: currentNoteId,
-        //     body:text
-        // })
-        // setNotes(oldnotes => temp)
-        console.log("updating a note to firfebase")
         const docRef = doc(db, "notes", currentNoteId)
         await setDoc(docRef, { body: text, updatedAt:Date.now() },{merge:true})
     }
     
     function deleteNote(event, noteId) {
         event.stopPropagation()
-        // let temp = [...notes]
-        // temp = temp.filter(tem => tem.id != noteId)
-        
-        // if(noteId === currentNoteId) setCurrentNoteId( (temp[0]?.id) || '')
-        // setNotes(temp)
-        console.log("deleting a note from firfebase")
         const docRef = doc(db,'notes',noteId)
         deleteDoc(docRef)
     } 
